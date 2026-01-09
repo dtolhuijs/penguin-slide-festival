@@ -1,6 +1,10 @@
 const presentImage = new Image();
 presentImage.src = "sprites/present.png";
 
+const rockImage = new Image();
+rockImage.src = "sprites/rock.png";
+
+
 import { getWorldOffset, getPath } from "./world.js";
 
 let collectibles = [];
@@ -16,13 +20,17 @@ export function updateCollectibles(canvas, penguin) {
 
   if (spawnTimer > 200) {
     const { pathX, pathWidth } = getPath();
-    collectibles.push({
-      x: Math.random() * pathWidth + pathX,
-      y: getWorldOffset() - 20,
-      size: 12,
-      rotation: 0,
-      speed: 2
-    });
+    const isRock = Math.random() < 0.3; // 30% chance rock
+
+collectibles.push({
+  type: isRock ? "rock" : "present",
+  x: Math.random() * pathWidth + pathX,
+  y: getWorldOffset() - 20,
+  size: isRock ? 10 : 12,
+  rotation: 0,
+  speed: isRock ? 1.6 : 2
+});
+
     spawnTimer = 0;
   }
 
@@ -35,9 +43,15 @@ export function updateCollectibles(canvas, penguin) {
     const dy = screenY - penguin.screenY;
 
     if (Math.sqrt(dx * dx + dy * dy) < penguin.radius + c.size) {
-      score++;
+      if (c.type === "present") {
+        score++;
+      } else if (c.type === "rock") {
+        score = Math.max(0, score - 1);
+      }
+    
       collectibles.splice(i, 1);
     }
+    
   });
 }
 
@@ -50,13 +64,26 @@ export function drawCollectibles(ctx) {
     ctx.translate(c.x, screenY);
     ctx.rotate(c.rotation);
 
-    ctx.drawImage(
-      presentImage,
-      -size / 2,
-      -size / 2,
-      size,
-      size
-    );
+    if (c.type === "present") {
+      ctx.drawImage(
+        presentImage,
+        -size / 2,
+        -size / 2,
+        size,
+        size
+      );
+    } else {
+      // 🪨 Rock
+      ctx.globalAlpha = 0.9;
+      ctx.drawImage(
+        rockImage,
+        -size / 2,
+        -size / 2,
+        size,
+        size
+      );
+    }
+    
 
     ctx.restore();
   });

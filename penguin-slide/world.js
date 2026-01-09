@@ -7,6 +7,14 @@ let pathWidth = 240;
 let pathX = 0;
 
 let auroraTime = 0;
+let lightsTime = 0;
+
+const lightColors = [
+  "#ff6b6b", // red
+  "#ffd93d", // yellow
+  "#6bcf9b", // green
+  "#6bbcff"  // blue
+];
 
 
 export function initWorld(canvas) {
@@ -22,6 +30,8 @@ export function updateWorld() {
   scrollSpeed = Math.max(0.3, Math.min(scrollSpeed, 4));
   worldOffsetY += scrollSpeed;
   auroraTime += 0.002; // very slow, cozy movement
+  lightsTime += 0.03; // slow cozy flicker
+
 }
 
 export function drawWorld(ctx, canvas) {
@@ -95,6 +105,39 @@ ctx.fillRect(pathX, 0, pathWidth, canvas.height);
 ctx.strokeStyle = "rgba(255,255,255,0.25)";
 ctx.lineWidth = 1.5;
 ctx.strokeRect(pathX, 0, pathWidth, canvas.height);
+
+// 🎄 Christmas lights along the ice path
+const lightSpacing = 42;
+const lightRadius = 4;
+
+for (let y = 20; y < canvas.height; y += lightSpacing) {
+  const flicker = (Math.sin(lightsTime + y * 0.1) + 1) * 0.5;
+  const glow = 6 + flicker * 4;
+
+  const colorLeft = lightColors[Math.floor((y / lightSpacing) % lightColors.length)];
+  const colorRight = lightColors[Math.floor((y / lightSpacing + 1) % lightColors.length)];
+
+  // Left side
+  ctx.save();
+  ctx.shadowColor = colorLeft;
+  ctx.shadowBlur = glow;
+  ctx.fillStyle = colorLeft;
+  ctx.beginPath();
+  ctx.arc(pathX - 8, y, lightRadius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Right side
+  ctx.save();
+  ctx.shadowColor = colorRight;
+  ctx.shadowBlur = glow;
+  ctx.fillStyle = colorRight;
+  ctx.beginPath();
+  ctx.arc(pathX + pathWidth + 8, y, lightRadius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
 
 
 }
