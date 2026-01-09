@@ -30,10 +30,34 @@ export function updatePenguin(canvas) {
   );
 }
 
+
 export function drawPenguin(ctx, canvas) {
   const wobble = Math.sin(time) * 2.5;
   const size = 40;
 
+  // 🐧 Shadow
+  ctx.save();
+  ctx.globalAlpha = 0.25;
+  ctx.fillStyle = "#000";
+  ctx.beginPath();
+  ctx.ellipse(
+    penguin.x,
+    penguin.screenY + 18,
+    18,
+    6,
+    0,
+    0,
+    Math.PI * 2
+  );
+  ctx.fill();
+  ctx.restore();
+
+  // ✨ Glow
+  ctx.save();
+  ctx.shadowColor = "rgba(255,255,255,0.4)";
+  ctx.shadowBlur = 10;
+
+  // 🐧 Penguin sprite
   ctx.drawImage(
     penguinImage,
     penguin.x + wobble - size / 2,
@@ -41,7 +65,10 @@ export function drawPenguin(ctx, canvas) {
     size,
     size
   );
+
+  ctx.restore();
 }
+
 
 export function getPenguin() {
   return penguin;

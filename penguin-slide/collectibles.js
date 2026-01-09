@@ -1,3 +1,6 @@
+const presentImage = new Image();
+presentImage.src = "sprites/present.png";
+
 import { getWorldOffset, getPath } from "./world.js";
 
 let collectibles = [];
@@ -11,7 +14,7 @@ export function initCollectibles() {
 export function updateCollectibles(canvas, penguin) {
   spawnTimer++;
 
-  if (spawnTimer > 120) {
+  if (spawnTimer > 200) {
     const { pathX, pathWidth } = getPath();
     collectibles.push({
       x: Math.random() * pathWidth + pathX,
@@ -41,19 +44,25 @@ export function updateCollectibles(canvas, penguin) {
 export function drawCollectibles(ctx) {
   collectibles.forEach(c => {
     const screenY = c.y - getWorldOffset();
+    const size = c.size * 3; // visual size of present
+
     ctx.save();
     ctx.translate(c.x, screenY);
     ctx.rotate(c.rotation);
 
-    ctx.fillStyle = "#ff6b6b";
-    ctx.beginPath();
-    ctx.arc(0, 0, c.size, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.drawImage(
+      presentImage,
+      -size / 2,
+      -size / 2,
+      size,
+      size
+    );
 
     ctx.restore();
   });
 
-  ctx.fillStyle = "white";
-  ctx.font = "20px Arial";
-  ctx.fillText(`Score: ${score}`, 10, 30);
+  // 🎁 Cozy score UI
+  ctx.fillStyle = "rgba(255,255,255,0.85)";
+  ctx.font = "18px system-ui, sans-serif";
+  ctx.fillText(`🎁 ${score}`, 20, 32);
 }
